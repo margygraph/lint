@@ -1,6 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform, useInView, AnimatePresence } from 'framer-motion';
 import { IMAGES } from './images';
+import {
+  IconCar, IconBuilding, IconHotel, IconSolar, IconBoat, IconHospital,
+  IconPrinter, IconTag, IconBox, IconPalette,
+  IconToolbox, IconHome,
+  IconMoney, IconTarget, IconClipboard,
+  IconLeaf, IconFactory, IconMicroscope,
+  IconSparkle, IconDrop, IconArrowRight, IconCheck
+} from './icons';
 
 // ===== FRESH GRAIN OVERLAY (very subtle) =====
 function FreshOverlay() {
@@ -355,7 +363,7 @@ function Gamma() {
                 </p>
                 <div className="flex items-center gap-2 text-sky-500">
                   <span className="text-xs uppercase tracking-wider font-semibold">Scopri</span>
-                  <span className="text-lg group-hover:translate-x-1 transition-transform duration-300">→</span>
+                  <IconArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
                 </div>
               </div>
             </motion.div>
@@ -465,9 +473,9 @@ function ProductLines() {
 // ===== QUALITÀ =====
 function Qualita() {
   const pillars = [
-    { num: 'I', title: 'Sostenibilità', value: '90%', label: 'meno chimici', desc: 'Alta efficacia pulente con la sola acqua. Riduzione drastica dei detergenti chimici.', image: IMAGES.sostenibilita, gradient: 'from-emerald-400 to-green-500' },
-    { num: 'II', title: 'Durata', value: '500+', label: 'cicli a 90°C', desc: 'Resistenza certificata. Un investimento, non un costo ricorrente.', image: IMAGES.durata, gradient: 'from-sky-400 to-blue-500' },
-    { num: 'III', title: 'Efficacia', value: '99.9%', label: 'batteri rimossi', desc: 'Certificazione indipendente. Standard sanitari e detailing.', image: IMAGES.efficacia, gradient: 'from-cyan-400 to-teal-500' },
+    { num: 'I', title: 'Sostenibilità', value: '90%', label: 'meno chimici', desc: 'Alta efficacia pulente con la sola acqua. Riduzione drastica dei detergenti chimici.', image: IMAGES.sostenibilita, icon: IconLeaf, gradient: 'from-emerald-400 to-green-500' },
+    { num: 'II', title: 'Durata', value: '500+', label: 'cicli a 90°C', desc: 'Resistenza certificata. Un investimento, non un costo ricorrente.', image: IMAGES.durata, icon: IconFactory, gradient: 'from-sky-400 to-blue-500' },
+    { num: 'III', title: 'Efficacia', value: '99.9%', label: 'batteri rimossi', desc: 'Certificazione indipendente. Standard sanitari e detailing.', image: IMAGES.efficacia, icon: IconMicroscope, gradient: 'from-cyan-400 to-teal-500' },
   ];
 
   return (
@@ -491,8 +499,11 @@ function Qualita() {
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: i * 0.2 }}
             >
-              <div className="w-full h-48 rounded-2xl overflow-hidden mb-6">
+              <div className="relative w-full h-48 rounded-2xl overflow-hidden mb-6">
                 <img src={pillar.image} alt={pillar.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                <div className="absolute top-4 right-4 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                  <pillar.icon className="w-5 h-5 text-sky-500" />
+                </div>
               </div>
               <div className="mb-6">
                 <span className={`text-5xl lg:text-6xl font-bold bg-gradient-to-r ${pillar.gradient} bg-clip-text text-transparent`}>
@@ -513,12 +524,12 @@ function Qualita() {
 // ===== SETTORI =====
 function Settori() {
   const sectors = [
-    { name: 'Car Detailing', icon: '🚗', desc: 'Edgeless, asciugatura ultra-assorbente, cura interni premium', gradient: 'from-sky-400 to-blue-500' },
-    { name: 'Imprese Pulizia', icon: '🏢', desc: 'Color code HACCP, alta resistenza, lavaggio industriale', gradient: 'from-cyan-400 to-teal-500' },
-    { name: 'Hotel & Ristoranti', icon: '🏨', desc: 'Finitura cristallina, igiene certificata, personalizzazione', gradient: 'from-emerald-400 to-green-500' },
-    { name: 'Fotovoltaico', icon: '☀️', desc: 'Kit dedicati, antigraffio, asciugatura senza aloni', gradient: 'from-teal-400 to-cyan-500' },
-    { name: 'Nautica', icon: '⛵', desc: 'Protezione superfici delicate, assorbimento massimo', gradient: 'from-blue-400 to-sky-500' },
-    { name: 'Sanitario', icon: '🏥', desc: 'Rimozione batteri 99.9%, protocolli certificati', gradient: 'from-green-400 to-emerald-500' },
+    { name: 'Car Detailing', icon: IconCar, desc: 'Edgeless, asciugatura ultra-assorbente, cura interni premium', gradient: 'from-sky-400 to-blue-500' },
+    { name: 'Imprese Pulizia', icon: IconBuilding, desc: 'Color code HACCP, alta resistenza, lavaggio industriale', gradient: 'from-cyan-400 to-teal-500' },
+    { name: 'Hotel & Ristoranti', icon: IconHotel, desc: 'Finitura cristallina, igiene certificata, personalizzazione', gradient: 'from-emerald-400 to-green-500' },
+    { name: 'Fotovoltaico', icon: IconSolar, desc: 'Kit dedicati, antigraffio, asciugatura senza aloni', gradient: 'from-teal-400 to-cyan-500' },
+    { name: 'Nautica', icon: IconBoat, desc: 'Protezione superfici delicate, assorbimento massimo', gradient: 'from-blue-400 to-sky-500' },
+    { name: 'Sanitario', icon: IconHospital, desc: 'Rimozione batteri 99.9%, protocolli certificati', gradient: 'from-green-400 to-emerald-500' },
   ];
 
   return (
@@ -543,8 +554,8 @@ function Settori() {
               transition={{ duration: 0.6, delay: i * 0.1 }}
               whileHover={{ y: -5 }}
             >
-              <div className={`w-16 h-16 bg-gradient-to-br ${sector.gradient} rounded-2xl flex items-center justify-center text-3xl mb-6 shadow-lg shadow-sky-200/30 group-hover:scale-110 transition-transform duration-500`}>
-                {sector.icon}
+              <div className={`w-16 h-16 bg-gradient-to-br ${sector.gradient} rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-sky-200/30 group-hover:scale-110 transition-transform duration-500`}>
+                <sector.icon className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-lg font-bold text-gray-800 mb-2 group-hover:text-sky-600 transition-colors duration-300">
                 {sector.name}
@@ -580,10 +591,10 @@ function Customization() {
 
             <div className="space-y-6">
               {[
-                { title: 'Serigrafia HD', desc: 'Logo diretto ad alta risoluzione', icon: '🖨️' },
-                { title: 'Etichette Tessuto', desc: 'Branding permanente e premium', icon: '🏷️' },
-                { title: 'Packaging Custom', desc: 'Confezioni completamente personalizzate', icon: '📦' },
-                { title: 'Color Matching', desc: 'Pantone matching per coerenza brand', icon: '🎨' },
+                { title: 'Serigrafia HD', desc: 'Logo diretto ad alta risoluzione', icon: IconPrinter },
+                { title: 'Etichette Tessuto', desc: 'Branding permanente e premium', icon: IconTag },
+                { title: 'Packaging Custom', desc: 'Confezioni completamente personalizzate', icon: IconBox },
+                { title: 'Color Matching', desc: 'Pantone matching per coerenza brand', icon: IconPalette },
               ].map((item, i) => (
                 <motion.div
                   key={item.title}
@@ -593,7 +604,9 @@ function Customization() {
                   viewport={{ once: true }}
                   transition={{ duration: 0.6, delay: i * 0.1 }}
                 >
-                  <div className="text-2xl">{item.icon}</div>
+                  <div className="w-10 h-10 bg-gradient-to-br from-sky-100 to-cyan-100 rounded-xl flex items-center justify-center group-hover:from-sky-200 group-hover:to-cyan-200 transition-all duration-300">
+                    <item.icon className="w-5 h-5 text-sky-500" />
+                  </div>
                   <div>
                     <h4 className="text-gray-800 font-semibold">{item.title}</h4>
                     <p className="text-gray-500 text-sm font-light">{item.desc}</p>
@@ -608,7 +621,7 @@ function Customization() {
               whileHover={{ scale: 1.05 }}
             >
               Richiedi Personalizzazione
-              <span>→</span>
+              <IconArrowRight className="w-4 h-4" />
             </motion.a>
           </div>
 
@@ -643,7 +656,7 @@ function Customization() {
                 animate={{ y: [0, -10, 0] }}
                 transition={{ duration: 3, repeat: Infinity }}
               >
-                <div className="text-2xl">✨</div>
+                <IconSparkle className="w-6 h-6 text-sky-400" />
                 <div className="text-xs text-gray-600 font-medium mt-1">Premium</div>
               </motion.div>
               <motion.div
@@ -651,7 +664,7 @@ function Customization() {
                 animate={{ y: [0, 10, 0] }}
                 transition={{ duration: 4, repeat: Infinity }}
               >
-                <div className="text-2xl">💧</div>
+                <IconDrop className="w-6 h-6 text-cyan-400" />
                 <div className="text-xs text-gray-600 font-medium mt-1">Fresh</div>
               </motion.div>
             </div>
@@ -665,9 +678,9 @@ function Customization() {
 // ===== BLOG =====
 function Blog() {
   const posts = [
-    { title: 'Il Kit Essenziale: 5 Panni che Ogni Professionista Deve Avere', date: 'Ago 2025', cat: 'GUIDE', emoji: '🧰' },
-    { title: 'Come Lavare l\'Auto Senza Graffiarla: Guida Definitiva', date: 'Ago 2025', cat: 'DETAILING', emoji: '🚗' },
-    { title: 'Panni in Microfibra per Pulizie Domestiche', date: 'Set 2025', cat: 'GUIDE', emoji: '🏠' },
+    { title: 'Il Kit Essenziale: 5 Panni che Ogni Professionista Deve Avere', date: 'Ago 2025', cat: 'GUIDE', icon: IconToolbox },
+    { title: 'Come Lavare l\'Auto Senza Graffiarla: Guida Definitiva', date: 'Ago 2025', cat: 'DETAILING', icon: IconCar },
+    { title: 'Panni in Microfibra per Pulizie Domestiche', date: 'Set 2025', cat: 'GUIDE', icon: IconHome },
   ];
 
   return (
@@ -681,7 +694,8 @@ function Blog() {
             </h2>
           </div>
           <a href="#" className="text-sky-500 font-semibold hover:text-sky-600 transition-colors flex items-center gap-2">
-            Tutti gli articoli →
+            Tutti gli articoli
+            <IconArrowRight className="w-4 h-4" />
           </a>
         </div>
 
@@ -697,7 +711,7 @@ function Blog() {
               whileHover={{ y: -5 }}
             >
               <div className="bg-gradient-to-br from-sky-50 to-cyan-50 p-12 flex items-center justify-center">
-                <div className="text-6xl group-hover:scale-110 transition-transform duration-500">{post.emoji}</div>
+                <post.icon className="w-16 h-16 text-sky-400 group-hover:scale-110 transition-transform duration-500" />
               </div>
               <div className="p-8">
                 <div className="flex items-center gap-3 mb-4">
@@ -709,7 +723,7 @@ function Blog() {
                 </h3>
                 <div className="flex items-center gap-2 text-sky-500">
                   <span className="text-xs uppercase tracking-wider font-semibold">Leggi</span>
-                  <span>→</span>
+                  <IconArrowRight className="w-3 h-3" />
                 </div>
               </div>
             </motion.article>
@@ -750,10 +764,10 @@ function Contact() {
 
             <div className="space-y-6">
               {[
-                { icon: '💰', title: 'Listino Riservato', desc: 'Condizioni B2B vantaggiose' },
-                { icon: '🎯', title: 'Consulenza Gratuita', desc: 'Scelta dei prodotti performanti' },
-                { icon: '📋', title: 'Schede Tecniche', desc: 'Documentazione completa' },
-                { icon: '🎨', title: 'Personalizzazione', desc: 'Il tuo brand sui prodotti' },
+                { icon: IconMoney, title: 'Listino Riservato', desc: 'Condizioni B2B vantaggiose' },
+                { icon: IconTarget, title: 'Consulenza Gratuita', desc: 'Scelta dei prodotti performanti' },
+                { icon: IconClipboard, title: 'Schede Tecniche', desc: 'Documentazione completa' },
+                { icon: IconPalette, title: 'Personalizzazione', desc: 'Il tuo brand sui prodotti' },
               ].map((item, i) => (
                 <motion.div
                   key={item.title}
@@ -763,7 +777,9 @@ function Contact() {
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: i * 0.1 }}
                 >
-                  <div className="text-2xl">{item.icon}</div>
+                  <div className="w-12 h-12 bg-gradient-to-br from-sky-100 to-cyan-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <item.icon className="w-6 h-6 text-sky-500" />
+                  </div>
                   <div>
                     <h4 className="text-gray-800 font-semibold">{item.title}</h4>
                     <p className="text-gray-500 text-sm font-light">{item.desc}</p>
@@ -790,7 +806,7 @@ function Contact() {
                   className="flex flex-col items-center justify-center text-center py-16"
                 >
                   <div className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-green-500 rounded-full flex items-center justify-center mb-6 shadow-xl shadow-emerald-200/50">
-                    <span className="text-white text-3xl">✓</span>
+                    <IconCheck className="w-10 h-10 text-white" />
                   </div>
                   <h3 className="text-2xl font-bold text-gray-800 mb-2">Richiesta Inviata!</h3>
                   <p className="text-gray-500 font-light">Ti contatteremo entro 24 ore lavorative.</p>
@@ -924,9 +940,14 @@ function Footer() {
               href="https://www.ebay.it/str/lintpannimircrofibra"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block mt-6 bg-gradient-to-r from-sky-400 to-cyan-400 text-white px-5 py-2.5 rounded-full text-xs font-semibold shadow-lg shadow-sky-200/50 hover:shadow-xl transition-all"
+              className="inline-flex items-center gap-2 mt-6 bg-gradient-to-r from-sky-400 to-cyan-400 text-white px-5 py-2.5 rounded-full text-xs font-semibold shadow-lg shadow-sky-200/50 hover:shadow-xl transition-all"
             >
-              🛒 eBay → Privati
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="9" cy="21" r="1" />
+                <circle cx="20" cy="21" r="1" />
+                <path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6" />
+              </svg>
+              eBay → Privati
             </a>
           </div>
         </div>
