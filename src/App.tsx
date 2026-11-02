@@ -1,702 +1,474 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { motion, useScroll, useTransform, useInView, AnimatePresence } from 'framer-motion';
+
+// ===== CINEMATIC GRAIN OVERLAY =====
+function GrainOverlay() {
+  return (
+    <div className="fixed inset-0 pointer-events-none z-[100] opacity-[0.03]">
+      <div className="absolute inset-0" style={{
+        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E")`,
+        backgroundRepeat: 'repeat',
+        backgroundSize: '128px 128px'
+      }} />
+    </div>
+  );
+}
+
+// ===== CINEMATIC LETTERBOX =====
+function Letterbox() {
+  return (
+    <>
+      <div className="fixed top-0 left-0 right-0 h-[3vh] bg-black z-[90] pointer-events-none" />
+      <div className="fixed bottom-0 left-0 right-0 h-[3vh] bg-black z-[90] pointer-events-none" />
+    </>
+  );
+}
+
+// ===== SCROLL PROGRESS BAR =====
+function ScrollProgress() {
+  const { scrollYProgress } = useScroll();
+  return (
+    <motion.div
+      className="fixed top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-500 z-[95] origin-left"
+      style={{ scaleX: scrollYProgress }}
+    />
+  );
+}
 
 // ===== HEADER =====
 function Header() {
   const [scrolled, setScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50);
+    const handleScroll = () => setScrolled(window.scrollY > 100);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/95 backdrop-blur-md shadow-lg' : 'bg-transparent'}`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
+    <motion.header
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      transition={{ duration: 1, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+      className={`fixed top-[3vh] left-0 right-0 z-[80] transition-all duration-700 ${
+        scrolled ? 'bg-black/80 backdrop-blur-xl border-b border-white/5' : ''
+      }`}
+    >
+      <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
+        <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-cyan-500 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">L</span>
+          <motion.div
+            className="flex items-center gap-3"
+            whileHover={{ scale: 1.02 }}
+          >
+            <div className="w-8 h-8 bg-white rounded-sm flex items-center justify-center">
+              <span className="text-black font-black text-sm">L</span>
             </div>
-            <div>
-              <span className={`font-bold text-xl tracking-tight ${scrolled ? 'text-gray-900' : 'text-white'}`}>LINT</span>
-              <span className={`block text-[10px] uppercase tracking-widest ${scrolled ? 'text-gray-500' : 'text-white/70'}`}>Professional Cleaning</span>
+            <div className="hidden sm:block">
+              <span className="text-white font-bold text-lg tracking-tight">LINT</span>
             </div>
-          </div>
+          </motion.div>
 
-          {/* Desktop Nav */}
-          <nav className="hidden lg:flex items-center gap-8">
-            {['Prodotti', 'Settori', 'Personalizzazione', 'Blog', 'Contatti'].map((item) => (
-              <a
+          {/* Nav */}
+          <nav className="hidden lg:flex items-center gap-10">
+            {['Gamma', 'Settori', 'Qualità', 'Blog', 'Contatti'].map((item, i) => (
+              <motion.a
                 key={item}
                 href={`#${item.toLowerCase()}`}
-                className={`text-sm font-medium transition-colors hover:text-blue-500 ${scrolled ? 'text-gray-700' : 'text-white/90'}`}
+                className="text-white/60 text-[13px] font-medium tracking-wide uppercase hover:text-white transition-colors duration-300"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.8 + i * 0.1 }}
               >
                 {item}
-              </a>
+              </motion.a>
             ))}
           </nav>
 
-          {/* CTA Button */}
-          <div className="hidden lg:block">
-            <a
-              href="#contatti"
-              className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-6 py-2.5 rounded-full text-sm font-semibold hover:shadow-lg hover:shadow-blue-500/25 transition-all hover:scale-105"
-            >
-              Richiedi Preventivo
-            </a>
-          </div>
-
-          {/* Mobile menu button */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className={`lg:hidden p-2 rounded-lg ${scrolled ? 'text-gray-700' : 'text-white'}`}
+          {/* CTA */}
+          <motion.a
+            href="#contatti"
+            className="hidden lg:block bg-white text-black px-6 py-2.5 text-[13px] font-semibold tracking-wide uppercase hover:bg-blue-400 hover:text-white transition-all duration-300"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 1.2 }}
+            whileHover={{ scale: 1.05 }}
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              {mobileMenuOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              )}
-            </svg>
+            Preventivo
+          </motion.a>
+
+          {/* Mobile toggle */}
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="lg:hidden text-white p-2"
+          >
+            <div className="w-6 flex flex-col gap-1.5">
+              <motion.span animate={{ rotate: menuOpen ? 45 : 0, y: menuOpen ? 6 : 0 }} className="w-full h-[1.5px] bg-white block" />
+              <motion.span animate={{ opacity: menuOpen ? 0 : 1 }} className="w-full h-[1.5px] bg-white block" />
+              <motion.span animate={{ rotate: menuOpen ? -45 : 0, y: menuOpen ? -6 : 0 }} className="w-full h-[1.5px] bg-white block" />
+            </div>
           </button>
         </div>
       </div>
 
       {/* Mobile Menu */}
-      {mobileMenuOpen && (
-        <div className="lg:hidden bg-white border-t shadow-xl">
-          <div className="px-4 py-6 space-y-4">
-            {['Prodotti', 'Settori', 'Personalizzazione', 'Blog', 'Contatti'].map((item) => (
-              <a
-                key={item}
-                href={`#${item.toLowerCase()}`}
-                className="block text-gray-700 font-medium py-2"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                {item}
-              </a>
-            ))}
-            <a
-              href="#contatti"
-              className="block bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-center px-6 py-3 rounded-full font-semibold mt-4"
-            >
-              Richiedi Preventivo
-            </a>
-          </div>
-        </div>
-      )}
-    </header>
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="lg:hidden bg-black/95 backdrop-blur-xl border-t border-white/5"
+          >
+            <div className="px-6 py-8 space-y-6">
+              {['Gamma', 'Settori', 'Qualità', 'Blog', 'Contatti'].map((item) => (
+                <a key={item} href={`#${item.toLowerCase()}`} className="block text-white/80 text-lg font-light" onClick={() => setMenuOpen(false)}>
+                  {item}
+                </a>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.header>
   );
 }
 
 // ===== HERO =====
 function Hero() {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
+  const y = useTransform(scrollYProgress, [0, 1], [0, 200]);
+  const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 1.1]);
+
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden">
-      {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-blue-950 to-gray-900">
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500 rounded-full blur-[128px]" />
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-400 rounded-full blur-[128px]" />
-        </div>
-        {/* Grid pattern */}
-        <div className="absolute inset-0 opacity-5" style={{
-          backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
-          backgroundSize: '60px 60px'
-        }} />
-      </div>
+    <section ref={ref} className="relative h-[100vh] flex items-center justify-center overflow-hidden bg-black">
+      {/* Background layers */}
+      <motion.div style={{ scale }} className="absolute inset-0">
+        <div className="absolute inset-0 bg-gradient-to-b from-black via-blue-950/30 to-black" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(59,130,246,0.15)_0%,_transparent_70%)]" />
+        {/* Animated orbs */}
+        <motion.div
+          className="absolute top-1/3 left-1/4 w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[150px]"
+          animate={{ x: [0, 50, 0], y: [0, -30, 0] }}
+          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-cyan-500/15 rounded-full blur-[120px]"
+          animate={{ x: [0, -40, 0], y: [0, 40, 0] }}
+          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+        />
+      </motion.div>
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
-          <div>
-            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2 mb-8">
-              <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-              <span className="text-white/80 text-sm">Forniture B2B per Professionisti</span>
-            </div>
-            
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
-              Panni in Microfibra
-              <span className="block bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
-                Professionali
-              </span>
-            </h1>
-            
-            <p className="text-lg text-gray-300 mb-8 max-w-lg leading-relaxed">
-              Selezioniamo e distribuiamo i migliori panni in microfibra per i settori più esigenti. 
-              Soluzioni tecniche progettate per resistere all'uso intensivo e garantire risultati impeccabili.
-            </p>
+      {/* Content */}
+      <motion.div style={{ y, opacity }} className="relative z-10 text-center px-6 max-w-6xl mx-auto">
+        {/* Overline */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.3 }}
+          className="mb-8"
+        >
+          <span className="inline-block text-[11px] font-medium tracking-[0.3em] uppercase text-blue-400/80 border border-blue-400/20 px-5 py-2">
+            Forniture Professionali B2B
+          </span>
+        </motion.div>
 
-            <div className="flex flex-col sm:flex-row gap-4 mb-12">
-              <a
-                href="#contatti"
-                className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-8 py-4 rounded-full text-center font-semibold hover:shadow-xl hover:shadow-blue-500/25 transition-all hover:scale-105"
-              >
-                Richiedi Preventivo B2B
-              </a>
-              <a
-                href="#prodotti"
-                className="border border-white/30 text-white px-8 py-4 rounded-full text-center font-semibold hover:bg-white/10 transition-all"
-              >
-                Esplora la Gamma
-              </a>
-            </div>
+        {/* Main title */}
+        <motion.h1
+          initial={{ opacity: 0, y: 60 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1.2, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          className="text-[clamp(2.5rem,8vw,7rem)] font-black leading-[0.85] tracking-tighter text-white mb-8"
+        >
+          <span className="block">Panni in</span>
+          <span className="block bg-gradient-to-r from-blue-300 via-cyan-200 to-blue-300 bg-clip-text text-transparent">
+            Microfibra
+          </span>
+          <span className="block text-white/40 text-[0.5em] font-light tracking-normal mt-2">Professionali</span>
+        </motion.h1>
 
-            {/* Stats */}
-            <div className="grid grid-cols-3 gap-6">
-              {[
-                { value: '500+', label: 'Cicli Lavaggio' },
-                { value: '99.9%', label: 'Batteri Rimossi' },
-                { value: '-90%', label: 'Uso Chimici' },
-              ].map((stat) => (
-                <div key={stat.label} className="text-center sm:text-left">
-                  <div className="text-2xl sm:text-3xl font-bold text-white">{stat.value}</div>
-                  <div className="text-xs sm:text-sm text-gray-400 mt-1">{stat.label}</div>
-                </div>
-              ))}
-            </div>
-          </div>
+        {/* Subtitle */}
+        <motion.p
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.9 }}
+          className="text-white/50 text-lg md:text-xl max-w-2xl mx-auto font-light leading-relaxed mb-12"
+        >
+          Selezioniamo e distribuiamo i migliori panni in microfibra per i settori più esigenti. 
+          Soluzioni tecniche progettate per l'uso intensivo.
+        </motion.p>
 
-          {/* Hero Visual */}
-          <div className="hidden lg:block relative">
-            <div className="relative w-full aspect-square">
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-3xl backdrop-blur-sm border border-white/10" />
-              <div className="absolute inset-8 bg-gradient-to-br from-blue-600/30 to-cyan-500/30 rounded-2xl border border-white/10 flex items-center justify-center">
-                <div className="text-center p-8">
-                  <div className="text-8xl mb-4">🧹</div>
-                  <div className="text-white/80 text-sm font-medium">Qualità Certificata</div>
-                  <div className="text-white text-2xl font-bold mt-2">Made for Pros</div>
-                </div>
-              </div>
-              {/* Floating badges */}
-              <div className="absolute -top-4 -right-4 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-4 animate-bounce" style={{ animationDuration: '3s' }}>
-                <div className="text-2xl">✨</div>
-                <div className="text-white text-xs mt-1">Anti-Alone</div>
-              </div>
-              <div className="absolute -bottom-4 -left-4 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-4 animate-bounce" style={{ animationDuration: '4s' }}>
-                <div className="text-2xl">💧</div>
-                <div className="text-white text-xs mt-1">Super Assorbente</div>
-              </div>
-              <div className="absolute top-1/2 -right-8 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-4 animate-bounce" style={{ animationDuration: '3.5s' }}>
-                <div className="text-2xl">🛡️</div>
-                <div className="text-white text-xs mt-1">Antigraffio</div>
-              </div>
+        {/* CTAs */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 1.2 }}
+          className="flex flex-col sm:flex-row gap-4 justify-center"
+        >
+          <a
+            href="#contatti"
+            className="group relative bg-white text-black px-10 py-4 text-sm font-semibold tracking-wide uppercase overflow-hidden"
+          >
+            <span className="relative z-10 group-hover:text-white transition-colors duration-300">Richiedi Preventivo</span>
+            <div className="absolute inset-0 bg-blue-500 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
+          </a>
+          <a
+            href="#gamma"
+            className="border border-white/20 text-white/80 px-10 py-4 text-sm font-medium tracking-wide uppercase hover:border-white/50 hover:text-white transition-all duration-300"
+          >
+            Esplora la Gamma
+          </a>
+        </motion.div>
+
+        {/* Stats bar */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1, delay: 1.6 }}
+          className="mt-20 grid grid-cols-3 gap-8 max-w-lg mx-auto"
+        >
+          {[
+            { value: '500+', label: 'Cicli Lavaggio' },
+            { value: '99.9%', label: 'Batteri Rimossi' },
+            { value: '-90%', label: 'Uso Chimici' },
+          ].map((stat) => (
+            <div key={stat.label} className="text-center">
+              <div className="text-2xl md:text-3xl font-bold text-white">{stat.value}</div>
+              <div className="text-[10px] md:text-[11px] text-white/40 uppercase tracking-wider mt-1">{stat.label}</div>
             </div>
-          </div>
-        </div>
-      </div>
+          ))}
+        </motion.div>
+      </motion.div>
 
       {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-        <svg className="w-6 h-6 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-        </svg>
-      </div>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 2 }}
+        className="absolute bottom-[6vh] left-1/2 -translate-x-1/2"
+      >
+        <motion.div
+          animate={{ y: [0, 8, 0] }}
+          transition={{ duration: 2, repeat: Infinity }}
+          className="w-[1px] h-12 bg-gradient-to-b from-white/50 to-transparent"
+        />
+      </motion.div>
     </section>
   );
 }
 
-// ===== CATEGORIES =====
-function Categories() {
+// ===== SECTION REVEAL WRAPPER =====
+function RevealSection({ children, className = '', id = '' }: { children: React.ReactNode; className?: string; id?: string }) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-100px" });
+
+  return (
+    <section id={id} ref={ref} className={`relative ${className}`}>
+      <motion.div
+        initial={{ opacity: 0, y: 80 }}
+        animate={isInView ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+      >
+        {children}
+      </motion.div>
+    </section>
+  );
+}
+
+// ===== GAMMA / CATEGORIES =====
+function Gamma() {
   const categories = [
-    {
-      icon: '🧽',
-      title: 'Panni in Microfibra',
-      description: 'Vasta gamma con grammature e trame specifiche per ogni applicazione, dal detailing alla pulizia industriale.',
-      color: 'from-blue-500 to-blue-600',
-      items: ['Multiuso', 'Vetri', 'Asciugatura', 'Detailing']
-    },
-    {
-      icon: '🔧',
-      title: 'Accessori',
-      description: 'Attrezzatura che ottimizza il lavoro: spazzole anti-graffio, sistemi di lavaggio sicuri, pistole pneumatiche.',
-      color: 'from-cyan-500 to-teal-500',
-      items: ['Spazzole', 'Pistole Aria', 'Mop', 'Sistemi Lavaggio']
-    },
-    {
-      icon: '⚙️',
-      title: 'Ricambi',
-      description: 'Ricambi di alta qualità per aspiratori, mop e sistemi a estrazione per una lunga vita operativa.',
-      color: 'from-indigo-500 to-purple-500',
-      items: ['Aspiratori', 'Mop', 'Estrazione', 'Componenti']
-    },
-    {
-      icon: '🧪',
-      title: 'Prodotti Chimici',
-      description: 'Formule concentrate per risultati superiori: sgrassanti alcalini, soluzioni acide e detergenti innovativi.',
-      color: 'from-emerald-500 to-green-500',
-      items: ['Sgrassanti', 'Detergenti', 'Lucidanti', 'Disinfettanti']
-    },
+    { icon: '◼', title: 'Panni in Microfibra', desc: 'Grammature e trame specifiche per ogni applicazione professionale.', tag: 'CORE' },
+    { icon: '◻', title: 'Accessori', desc: 'Spazzole anti-graffio, pistole pneumatiche, sistemi di lavaggio.', tag: 'TOOLS' },
+    { icon: '△', title: 'Ricambi', desc: 'Componenti per aspiratori, mop e sistemi a estrazione.', tag: 'PARTS' },
+    { icon: '○', title: 'Prodotti Chimici', desc: 'Formule concentrate: sgrassanti, detergenti, disinfettanti.', tag: 'CHEM' },
   ];
 
   return (
-    <section id="prodotti" className="py-24 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <span className="text-blue-600 font-semibold text-sm uppercase tracking-wider">La Nostra Gamma</span>
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mt-3">
-            Soluzioni per Ogni Esigenza
+    <RevealSection id="gamma" className="py-32 lg:py-44 bg-black">
+      <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
+        {/* Section header */}
+        <div className="mb-20">
+          <span className="text-[11px] font-medium tracking-[0.3em] uppercase text-blue-400/60">01 — Gamma</span>
+          <h2 className="text-4xl md:text-6xl lg:text-7xl font-black text-white mt-4 tracking-tight leading-[0.9]">
+            Non un semplice<br />
+            <span className="text-white/30">panno.</span>
           </h2>
-          <p className="text-gray-600 mt-4 max-w-2xl mx-auto">
-            Non un semplice panno: la soluzione giusta per ogni compito. Ogni prodotto è selezionato per fornire performance superiori.
+          <p className="text-white/40 text-lg max-w-xl mt-6 font-light">
+            La soluzione giusta per ogni compito. Ogni prodotto selezionato per fornire performance superiori.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {categories.map((cat) => (
-            <div
+        {/* Grid */}
+        <div className="grid md:grid-cols-2 gap-[1px] bg-white/5">
+          {categories.map((cat, i) => (
+            <motion.div
               key={cat.title}
-              className="group bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border border-gray-100"
+              className="group bg-black p-10 lg:p-14 relative overflow-hidden cursor-pointer"
+              whileHover={{ backgroundColor: 'rgba(255,255,255,0.02)' }}
+              transition={{ duration: 0.4 }}
             >
-              <div className={`w-14 h-14 bg-gradient-to-br ${cat.color} rounded-xl flex items-center justify-center text-2xl mb-5 group-hover:scale-110 transition-transform`}>
+              <div className="absolute top-6 right-6 text-[10px] tracking-[0.2em] uppercase text-white/20 font-medium">
+                {cat.tag}
+              </div>
+              <div className="text-4xl text-blue-400/60 mb-8 group-hover:text-blue-400 transition-colors duration-500">
                 {cat.icon}
               </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2">{cat.title}</h3>
-              <p className="text-gray-600 text-sm mb-4 leading-relaxed">{cat.description}</p>
-              <div className="flex flex-wrap gap-2">
-                {cat.items.map((item) => (
-                  <span key={item} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
-                    {item}
-                  </span>
-                ))}
+              <h3 className="text-2xl lg:text-3xl font-bold text-white mb-3 group-hover:text-blue-300 transition-colors duration-500">
+                {cat.title}
+              </h3>
+              <p className="text-white/40 font-light leading-relaxed group-hover:text-white/60 transition-colors duration-500">
+                {cat.desc}
+              </p>
+              <div className="mt-8 flex items-center gap-2 text-white/30 group-hover:text-blue-400 transition-all duration-500">
+                <span className="text-[11px] uppercase tracking-wider font-medium">Scopri</span>
+                <motion.span className="text-lg" whileHover={{ x: 5 }}>→</motion.span>
               </div>
-            </div>
+              {/* Hover line */}
+              <div className="absolute bottom-0 left-0 w-0 h-[1px] bg-blue-400 group-hover:w-full transition-all duration-700" />
+            </motion.div>
           ))}
         </div>
       </div>
-    </section>
+    </RevealSection>
   );
 }
 
-// ===== PRODUCT TYPES =====
-function ProductTypes() {
-  const types = [
+// ===== PRODUCT LINES (CINEMATIC SPLIT) =====
+function ProductLines() {
+  const lines = [
     {
-      title: 'Panni Multiuso Professionali',
-      subtitle: 'Il Fondamento di Ogni Kit',
-      description: 'Progettati per essere i "muli da lavoro" di ogni professionista. Densità di fibre superiore per assorbimento e resistenza eccezionali.',
-      features: ['Performance Affidabile', 'Costruzione Durevole', 'Efficienza Superiore'],
-      gradient: 'from-blue-600 to-blue-800',
-      emoji: '🧹'
+      num: '01',
+      title: 'Multiuso',
+      subtitle: 'Professional Grade',
+      desc: 'Densità di fibre superiore per assorbimento e resistenza eccezionali. Il fondamento di ogni kit professionale.',
+      specs: ['300+ GSM', '500 cicli lavaggio', 'Multi-superficie']
     },
     {
-      title: 'Panni per Vetri e Finiture',
-      subtitle: 'La Perfezione Trasparente',
-      description: 'Trame specifiche ingegnerizzate per offrire una finitura cristallina e assolutamente impeccabile su vetri, specchi e superfici lucide.',
-      features: ['Finitura Anti-Alone', 'Tessitura Specifica', 'Sicurezza Superfici Delicate'],
-      gradient: 'from-cyan-600 to-blue-700',
-      emoji: '🪟'
+      num: '02',
+      title: 'Vetri & Finiture',
+      subtitle: 'Crystal Clear',
+      desc: 'Trame specifiche ingegnerizzate per finitura cristallina. Zero aloni, zero striature, zero pelucchi.',
+      specs: ['Nido d\'ape', 'Ultra-fine', 'Anti-alone']
     },
     {
-      title: 'Panni per Car Detailing',
-      subtitle: 'Ogni Dettaglio Conta',
-      description: 'Selezione curata per detailer esigenti. Bordi in seta, senza cuciture o a taglio laser per eliminare ogni rischio di graffio.',
-      features: ['Sicurezza Massima', 'Specificità per Compito', 'Grammature GSM'],
-      gradient: 'from-indigo-600 to-purple-700',
-      emoji: '🚗'
+      num: '03',
+      title: 'Car Detailing',
+      subtitle: 'Edgeless Technology',
+      desc: 'Bordi in seta, senza cuciture o taglio laser. La selezione curata per i detailer più esigenti.',
+      specs: ['Edgeless', 'Bordo seta', 'GSM 300-1200']
     },
   ];
 
   return (
-    <section className="py-24 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <span className="text-blue-600 font-semibold text-sm uppercase tracking-wider">Le Nostre Linee</span>
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mt-3">
-            La Soluzione Giusta per Ogni Compito
+    <RevealSection className="py-32 lg:py-44 bg-black">
+      <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
+        <div className="mb-20">
+          <span className="text-[11px] font-medium tracking-[0.3em] uppercase text-blue-400/60">02 — Linee</span>
+          <h2 className="text-4xl md:text-6xl lg:text-7xl font-black text-white mt-4 tracking-tight leading-[0.9]">
+            Ogni dettaglio<br />
+            <span className="text-white/30">conta.</span>
           </h2>
         </div>
 
-        <div className="space-y-8">
-          {types.map((type, index) => (
-            <div
-              key={type.title}
-              className={`grid lg:grid-cols-2 gap-8 items-center ${index % 2 === 1 ? 'lg:flex-row-reverse' : ''}`}
+        <div className="space-y-0">
+          {lines.map((line, i) => (
+            <motion.div
+              key={line.num}
+              className="group grid lg:grid-cols-12 gap-8 lg:gap-16 py-12 lg:py-16 border-t border-white/5 items-center hover:bg-white/[0.01] transition-colors duration-500 px-4 lg:px-0"
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: i * 0.15 }}
             >
-              <div className={`${index % 2 === 1 ? 'lg:order-2' : ''}`}>
-                <div className={`bg-gradient-to-br ${type.gradient} rounded-2xl p-10 text-white relative overflow-hidden`}>
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
-                  <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
-                  <div className="relative">
-                    <div className="text-6xl mb-4">{type.emoji}</div>
-                    <div className="text-sm font-medium text-white/70 uppercase tracking-wider">{type.subtitle}</div>
-                    <h3 className="text-2xl font-bold mt-2">{type.title}</h3>
-                  </div>
-                </div>
+              {/* Number */}
+              <div className="lg:col-span-1">
+                <span className="text-[11px] text-white/20 font-mono tracking-wider">{line.num}</span>
               </div>
-              <div className={`${index % 2 === 1 ? 'lg:order-1' : ''}`}>
-                <p className="text-gray-600 leading-relaxed mb-6">{type.description}</p>
-                <div className="space-y-3">
-                  {type.features.map((feature) => (
-                    <div key={feature} className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        </svg>
-                      </div>
-                      <span className="text-gray-700 font-medium">{feature}</span>
-                    </div>
-                  ))}
-                </div>
-                <a href="#contatti" className="inline-flex items-center gap-2 mt-6 text-blue-600 font-semibold hover:gap-3 transition-all">
-                  Scopri di più
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                  </svg>
-                </a>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
 
-// ===== WHY CHOOSE US =====
-function WhyChooseUs() {
-  const pillars = [
-    {
-      icon: '🌱',
-      title: 'Sostenibilità Ambientale',
-      description: 'L\'alta efficacia delle nostre fibre permette di ridurre fino al 90% l\'uso di detergenti chimici, ottenendo risultati superiori con la sola acqua.',
-      stat: '90%',
-      statLabel: 'meno chimici'
-    },
-    {
-      icon: '🏭',
-      title: 'Durata Industriale',
-      description: 'Resistenza certificata fino a 500 cicli di lavaggio a 90°C, mantenendo inalterate le proprietà di pulizia e assorbenza.',
-      stat: '500+',
-      statLabel: 'cicli lavaggio'
-    },
-    {
-      icon: '🔬',
-      title: 'Efficacia Certificata',
-      description: 'Rimozione del 99,9% di batteri certificata da laboratori indipendenti. Soddisfa gli standard più elevati dal detailing al sanitario.',
-      stat: '99.9%',
-      statLabel: 'batteri rimossi'
-    },
-  ];
-
-  return (
-    <section id="settori" className="py-24 bg-gradient-to-br from-gray-900 via-blue-950 to-gray-900 relative overflow-hidden">
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-0 left-1/3 w-96 h-96 bg-blue-400 rounded-full blur-[128px]" />
-        <div className="absolute bottom-0 right-1/3 w-96 h-96 bg-cyan-400 rounded-full blur-[128px]" />
-      </div>
-      
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <span className="text-cyan-400 font-semibold text-sm uppercase tracking-wider">La Differenza LINT</span>
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mt-3">
-            Qualità, Durata e Sostenibilità
-          </h2>
-          <p className="text-gray-400 mt-4 max-w-2xl mx-auto">
-            Tre pilastri fondamentali che garantiscono la superiorità dei nostri prodotti rispetto alle alternative sul mercato.
-          </p>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-8">
-          {pillars.map((pillar) => (
-            <div
-              key={pillar.title}
-              className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 hover:bg-white/10 transition-all duration-300 group"
-            >
-              <div className="text-5xl mb-6">{pillar.icon}</div>
-              <h3 className="text-xl font-bold text-white mb-3">{pillar.title}</h3>
-              <p className="text-gray-400 leading-relaxed mb-6">{pillar.description}</p>
-              <div className="pt-6 border-t border-white/10">
-                <span className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
-                  {pillar.stat}
-                </span>
-                <span className="text-gray-500 text-sm ml-2">{pillar.statLabel}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ===== SECTORS =====
-function Sectors() {
-  const sectors = [
-    { name: 'Car Detailing', icon: '🚗', desc: 'Panni edgeless, asciugatura ultra-assorbente, cura interni' },
-    { name: 'Imprese Pulizia', icon: '🏢', desc: 'Color code HACCP, alta resistenza, lavaggio industriale' },
-    { name: 'Hotel & Ristoranti', icon: '🏨', desc: 'Finitura cristallina, igiene certificata, personalizzazione' },
-    { name: 'Fotovoltaico', icon: '☀️', desc: 'Kit dedicati, antigraffio, asciugatura senza aloni' },
-    { name: 'Nautica', icon: '⛵', desc: 'Protezione superfici delicate, assorbimento massimo' },
-    { name: 'Sanitario', icon: '🏥', desc: 'Rimozione batteri 99.9%, monouso e riutilizzabili' },
-  ];
-
-  return (
-    <section className="py-24 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <span className="text-blue-600 font-semibold text-sm uppercase tracking-wider">Settori Serviti</span>
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mt-3">
-            Trova la Soluzione per il Tuo Settore
-          </h2>
-        </div>
-
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {sectors.map((sector) => (
-            <div
-              key={sector.name}
-              className="bg-white rounded-xl p-6 border border-gray-100 hover:border-blue-200 hover:shadow-lg transition-all duration-300 group cursor-pointer"
-            >
-              <div className="flex items-start gap-4">
-                <div className="text-4xl group-hover:scale-110 transition-transform">{sector.icon}</div>
-                <div>
-                  <h3 className="font-bold text-gray-900 text-lg mb-1">{sector.name}</h3>
-                  <p className="text-gray-500 text-sm">{sector.desc}</p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ===== CUSTOMIZATION =====
-function Customization() {
-  return (
-    <section id="personalizzazione" className="py-24 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
-          <div>
-            <span className="text-blue-600 font-semibold text-sm uppercase tracking-wider">Il Tuo Brand</span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mt-3 mb-6">
-              La Nostra Qualità,<br />il Tuo Brand
-            </h2>
-            <p className="text-gray-600 leading-relaxed mb-8">
-              Servizio completo di personalizzazione per la tua linea di panni in microfibra professionali. 
-              Stampa serigrafica di alta qualità o etichette in tessuto personalizzate per trasformare 
-              i nostri prodotti in un potente strumento di marketing.
-            </p>
-
-            <div className="space-y-4 mb-8">
-              {[
-                { title: 'Aumenta la Visibilità', desc: 'Ogni panno diventa un biglietto da visita del tuo marchio' },
-                { title: 'Prodotto Esclusivo', desc: 'Distinguiti dalla concorrenza con una linea personalizzata' },
-                { title: 'Massima Flessibilità', desc: 'Diverse opzioni di stampa ed etichettatura su misura' },
-              ].map((item) => (
-                <div key={item.title} className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900">{item.title}</h4>
-                    <p className="text-gray-500 text-sm">{item.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <a
-              href="#contatti"
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-8 py-4 rounded-full font-semibold hover:shadow-xl hover:shadow-blue-500/25 transition-all hover:scale-105"
-            >
-              Richiedi Personalizzazione
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
-            </a>
-          </div>
-
-          <div className="relative">
-            <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-3xl p-10 border border-blue-100">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-white rounded-xl p-6 shadow-sm text-center">
-                  <div className="text-4xl mb-2">🖨️</div>
-                  <div className="font-semibold text-gray-900 text-sm">Serigrafia</div>
-                  <div className="text-gray-500 text-xs mt-1">Logo diretto</div>
-                </div>
-                <div className="bg-white rounded-xl p-6 shadow-sm text-center">
-                  <div className="text-4xl mb-2">🏷️</div>
-                  <div className="font-semibold text-gray-900 text-sm">Etichette</div>
-                  <div className="text-gray-500 text-xs mt-1">Tessuto personalizzato</div>
-                </div>
-                <div className="bg-white rounded-xl p-6 shadow-sm text-center">
-                  <div className="text-4xl mb-2">📦</div>
-                  <div className="font-semibold text-gray-900 text-sm">Packaging</div>
-                  <div className="text-gray-500 text-xs mt-1">Confezioni brandizzate</div>
-                </div>
-                <div className="bg-white rounded-xl p-6 shadow-sm text-center">
-                  <div className="text-4xl mb-2">🎨</div>
-                  <div className="font-semibold text-gray-900 text-sm">Colori</div>
-                  <div className="text-gray-500 text-xs mt-1">Pantone matching</div>
-                </div>
-              </div>
-              <div className="mt-6 bg-white rounded-xl p-4 shadow-sm flex items-center gap-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold">L</span>
-                </div>
-                <div>
-                  <div className="font-semibold text-gray-900 text-sm">→ Il Tuo Logo Qui</div>
-                  <div className="text-gray-500 text-xs">Trasforma i nostri prodotti nel tuo brand</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ===== FEATURED PRODUCTS =====
-function FeaturedProducts() {
-  const products = [
-    {
-      name: 'Kit Pulizia Pannelli Fotovoltaici Solar Wash',
-      category: 'Fotovoltaico',
-      emoji: '☀️',
-      features: ['Manico telescopico', 'Prolunga inclusa', 'Panno antigraffio']
-    },
-    {
-      name: 'Pistola Soffiaggio Aria con Snodo Regolabile',
-      category: 'Detailing',
-      emoji: '💨',
-      features: ['Snodo regolabile', 'Testine intercambiabili', 'Professionale']
-    },
-    {
-      name: 'Spazzola Cerchi Auto in Microfibra',
-      category: 'Car Care',
-      emoji: '🔵',
-      features: ['Antigraffio', 'Protezione integrata', 'Microfibra premium']
-    },
-    {
-      name: 'Panno Asciugatura ANTRA DRY',
-      category: 'Asciugatura',
-      emoji: '💧',
-      features: ['Extra assorbente', 'Auto/Casa/Doccia', 'Long life']
-    },
-  ];
-
-  return (
-    <section className="py-24 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-12">
-          <div>
-            <span className="text-blue-600 font-semibold text-sm uppercase tracking-wider">In Evidenza</span>
-            <h2 className="text-3xl font-bold text-gray-900 mt-2">Le Nostre Soluzioni Top</h2>
-          </div>
-          <a href="#contatti" className="mt-4 sm:mt-0 text-blue-600 font-semibold hover:underline flex items-center gap-1">
-            Vedi tutti i prodotti
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
-          </a>
-        </div>
-
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {products.map((product) => (
-            <div
-              key={product.name}
-              className="bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-xl transition-all duration-300 group"
-            >
-              <div className="bg-gradient-to-br from-gray-100 to-gray-50 p-8 flex items-center justify-center">
-                <div className="text-6xl group-hover:scale-110 transition-transform">{product.emoji}</div>
-              </div>
-              <div className="p-5">
-                <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
-                  {product.category}
-                </span>
-                <h3 className="font-bold text-gray-900 mt-3 mb-3 text-sm leading-snug">{product.name}</h3>
-                <div className="space-y-1.5 mb-4">
-                  {product.features.map((f) => (
-                    <div key={f} className="flex items-center gap-2 text-xs text-gray-500">
-                      <span className="w-1 h-1 bg-blue-400 rounded-full" />
-                      {f}
-                    </div>
-                  ))}
-                </div>
-                <a
-                  href="#contatti"
-                  className="block text-center bg-gray-900 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors"
-                >
-                  Richiedi Preventivo
-                </a>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ===== BLOG PREVIEW =====
-function BlogPreview() {
-  const posts = [
-    {
-      title: 'Il Kit di Panni in Microfibra Essenziale: I 5 Panni che Ogni Professionista Deve Avere',
-      date: '18 Agosto 2025',
-      category: 'Guide',
-      emoji: '🧰'
-    },
-    {
-      title: 'Come Lavare l\'Auto Senza Graffiarla: La Guida Definitiva al Lavaggio Sicuro',
-      date: '17 Agosto 2025',
-      category: 'Detailing',
-      emoji: '🚗'
-    },
-    {
-      title: 'Panni in Microfibra per Pulizie Domestiche: La Guida Definitiva',
-      date: '24 Settembre 2025',
-      category: 'Casa',
-      emoji: '🏠'
-    },
-  ];
-
-  return (
-    <section id="blog" className="py-24 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <span className="text-blue-600 font-semibold text-sm uppercase tracking-wider">Dal Blog</span>
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mt-3">
-            Consigli e Guide per Professionisti
-          </h2>
-          <p className="text-gray-600 mt-4 max-w-2xl mx-auto">
-            La conoscenza è uno strumento tanto importante quanto un buon panno. 
-            Tecniche, segreti e guide per ottenere il massimo dalla tua attrezzatura.
-          </p>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-8">
-          {posts.map((post) => (
-            <article
-              key={post.title}
-              className="group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300"
-            >
-              <div className="bg-gradient-to-br from-blue-50 to-cyan-50 p-10 flex items-center justify-center">
-                <div className="text-6xl group-hover:scale-110 transition-transform">{post.emoji}</div>
-              </div>
-              <div className="p-6">
-                <div className="flex items-center gap-3 mb-3">
-                  <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded-full">{post.category}</span>
-                  <span className="text-xs text-gray-400">{post.date}</span>
-                </div>
-                <h3 className="font-bold text-gray-900 leading-snug group-hover:text-blue-600 transition-colors">
-                  {post.title}
+              {/* Title */}
+              <div className="lg:col-span-4">
+                <div className="text-[10px] tracking-[0.2em] uppercase text-blue-400/50 mb-2">{line.subtitle}</div>
+                <h3 className="text-3xl lg:text-4xl font-bold text-white group-hover:text-blue-300 transition-colors duration-500">
+                  {line.title}
                 </h3>
-                <a href="#" className="inline-flex items-center gap-1 mt-4 text-blue-600 text-sm font-semibold group-hover:gap-2 transition-all">
-                  Leggi l'articolo
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                  </svg>
-                </a>
               </div>
-            </article>
+
+              {/* Description */}
+              <div className="lg:col-span-4">
+                <p className="text-white/40 font-light leading-relaxed">{line.desc}</p>
+              </div>
+
+              {/* Specs */}
+              <div className="lg:col-span-3 flex lg:justify-end">
+                <div className="flex flex-wrap gap-2">
+                  {line.specs.map((spec) => (
+                    <span key={spec} className="text-[10px] tracking-wider uppercase text-white/30 border border-white/10 px-3 py-1.5 group-hover:border-blue-400/30 group-hover:text-blue-400/60 transition-all duration-500">
+                      {spec}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </RevealSection>
+  );
+}
+
+// ===== QUALITÀ (CINEMATIC FULL-WIDTH) =====
+function Qualita() {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
+  const x = useTransform(scrollYProgress, [0, 1], [-50, 50]);
+
+  const pillars = [
+    { num: 'I', title: 'Sostenibilità', value: '90%', label: 'meno chimici', desc: 'Alta efficacia pulente con la sola acqua. Riduzione drastica dei detergenti chimici.' },
+    { num: 'II', title: 'Durata', value: '500+', label: 'cicli a 90°C', desc: 'Resistenza certificata. Un investimento, non un costo ricorrente.' },
+    { num: 'III', title: 'Efficacia', value: '99.9%', label: 'batteri rimossi', desc: 'Certificazione indipendente. Standard sanitari e detailing.' },
+  ];
+
+  return (
+    <section ref={ref} id="qualità" className="py-32 lg:py-44 bg-black relative overflow-hidden">
+      {/* Background accent */}
+      <motion.div
+        style={{ x }}
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-600/5 rounded-full blur-[200px]"
+      />
+
+      <div className="relative max-w-[1400px] mx-auto px-6 lg:px-12">
+        <div className="mb-20">
+          <span className="text-[11px] font-medium tracking-[0.3em] uppercase text-blue-400/60">03 — Qualità</span>
+          <h2 className="text-4xl md:text-6xl lg:text-7xl font-black text-white mt-4 tracking-tight leading-[0.9]">
+            La differenza<br />
+            <span className="bg-gradient-to-r from-blue-300 to-cyan-200 bg-clip-text text-transparent">LINT.</span>
+          </h2>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-[1px] bg-white/5">
+          {pillars.map((pillar, i) => (
+            <motion.div
+              key={pillar.num}
+              className="bg-black p-10 lg:p-12 group"
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: i * 0.2 }}
+            >
+              <div className="text-[11px] text-white/20 font-mono mb-8">{pillar.num}</div>
+              <div className="mb-8">
+                <span className="text-5xl lg:text-6xl font-black bg-gradient-to-b from-white to-white/30 bg-clip-text text-transparent">
+                  {pillar.value}
+                </span>
+                <span className="text-white/30 text-sm ml-2 font-light">{pillar.label}</span>
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3">{pillar.title}</h3>
+              <p className="text-white/40 font-light leading-relaxed text-sm">{pillar.desc}</p>
+            </motion.div>
           ))}
         </div>
       </div>
@@ -704,125 +476,349 @@ function BlogPreview() {
   );
 }
 
-// ===== CONTACT FORM =====
-function ContactForm() {
-  const [formData, setFormData] = useState({
-    nome: '', azienda: '', piva: '', email: '', tel: '', messaggio: ''
-  });
-  const [submitted, setSubmitted] = useState(false);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 3000);
-  };
+// ===== SETTORI =====
+function Settori() {
+  const sectors = [
+    { name: 'Car Detailing', icon: '◈', desc: 'Edgeless, asciugatura ultra-assorbente, cura interni premium' },
+    { name: 'Imprese Pulizia', icon: '◇', desc: 'Color code HACCP, alta resistenza, lavaggio industriale' },
+    { name: 'Hotel & Ristoranti', icon: '◆', desc: 'Finitura cristallina, igiene certificata, personalizzazione' },
+    { name: 'Fotovoltaico', icon: '◉', desc: 'Kit dedicati, antigraffio, asciugatura senza aloni' },
+    { name: 'Nautica', icon: '◎', desc: 'Protezione superfici delicate, assorbimento massimo' },
+    { name: 'Sanitario', icon: '◍', desc: 'Rimozione batteri 99.9%, protocolli certificati' },
+  ];
 
   return (
-    <section id="contatti" className="py-24 bg-gradient-to-br from-gray-900 via-blue-950 to-gray-900 relative overflow-hidden">
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-blue-400 rounded-full blur-[128px]" />
-        <div className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-cyan-400 rounded-full blur-[128px]" />
-      </div>
+    <RevealSection id="settori" className="py-32 lg:py-44 bg-black">
+      <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
+        <div className="mb-20">
+          <span className="text-[11px] font-medium tracking-[0.3em] uppercase text-blue-400/60">04 — Settori</span>
+          <h2 className="text-4xl md:text-6xl lg:text-7xl font-black text-white mt-4 tracking-tight leading-[0.9]">
+            Per ogni<br />
+            <span className="text-white/30">settore.</span>
+          </h2>
+        </div>
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-16">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-[1px] bg-white/5">
+          {sectors.map((sector, i) => (
+            <motion.div
+              key={sector.name}
+              className="bg-black p-8 lg:p-10 group cursor-pointer relative overflow-hidden"
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: i * 0.1 }}
+              whileHover={{ backgroundColor: 'rgba(59,130,246,0.03)' }}
+            >
+              <div className="text-3xl text-blue-400/40 mb-6 group-hover:text-blue-400/80 transition-colors duration-500">
+                {sector.icon}
+              </div>
+              <h3 className="text-lg font-bold text-white mb-2 group-hover:text-blue-300 transition-colors duration-500">
+                {sector.name}
+              </h3>
+              <p className="text-white/30 text-sm font-light group-hover:text-white/50 transition-colors duration-500">
+                {sector.desc}
+              </p>
+              <div className="absolute bottom-0 left-0 w-0 h-[1px] bg-gradient-to-r from-blue-400 to-cyan-400 group-hover:w-full transition-all duration-700" />
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </RevealSection>
+  );
+}
+
+// ===== CUSTOMIZATION (CINEMATIC SPLIT) =====
+function Customization() {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
+  const y = useTransform(scrollYProgress, [0, 1], [100, -100]);
+
+  return (
+    <section ref={ref} id="personalizzazione" className="py-32 lg:py-44 bg-black relative overflow-hidden">
+      <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
+        <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+          {/* Left - Text */}
           <div>
-            <span className="text-cyan-400 font-semibold text-sm uppercase tracking-wider">Contattaci</span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-white mt-3 mb-6">
-              Sei un Rivenditore o un Professionista?
+            <span className="text-[11px] font-medium tracking-[0.3em] uppercase text-blue-400/60">05 — Brand</span>
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mt-4 tracking-tight leading-[0.9] mb-8">
+              La nostra<br />qualità.<br />
+              <span className="text-white/30">Il tuo brand.</span>
             </h2>
-            <p className="text-gray-300 leading-relaxed mb-8">
-              Il nostro team non è composto da semplici venditori, ma da consulenti specializzati pronti 
-              ad analizzare le tue esigenze specifiche per costruire un'offerta su misura per la tua attività.
+            <p className="text-white/40 text-lg font-light leading-relaxed mb-10 max-w-md">
+              Servizio completo di personalizzazione. Stampa serigrafica, etichette in tessuto, 
+              packaging dedicato. Trasforma i nostri prodotti nel tuo strumento di marketing.
             </p>
 
             <div className="space-y-6">
               {[
-                { icon: '💰', title: 'Listino Prezzi Riservato', desc: 'Condizioni vantaggiose per il mercato B2B' },
-                { icon: '🎯', title: 'Consulenza Tecnica Gratuita', desc: 'Guida nella scelta dei prodotti più performanti' },
-                { icon: '📋', title: 'Schede Tecniche Complete', desc: 'Tutta la documentazione per le tue operazioni' },
-                { icon: '🎨', title: 'Soluzioni Personalizzate', desc: 'Applichiamo il tuo brand sui nostri prodotti' },
-              ].map((item) => (
-                <div key={item.title} className="flex items-start gap-4">
-                  <div className="text-2xl">{item.icon}</div>
+                { title: 'Serigrafia HD', desc: 'Logo diretto ad alta risoluzione' },
+                { title: 'Etichette Tessuto', desc: 'Branding permanente e premium' },
+                { title: 'Packaging Custom', desc: 'Confezioni completamente personalizzate' },
+                { title: 'Color Matching', desc: 'Pantone matching per coerenza brand' },
+              ].map((item, i) => (
+                <motion.div
+                  key={item.title}
+                  className="flex items-start gap-4 group"
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: i * 0.1 }}
+                >
+                  <div className="w-6 h-[1px] bg-blue-400/50 mt-3 group-hover:w-10 transition-all duration-500" />
                   <div>
-                    <h4 className="font-semibold text-white">{item.title}</h4>
-                    <p className="text-gray-400 text-sm">{item.desc}</p>
+                    <h4 className="text-white font-medium text-sm">{item.title}</h4>
+                    <p className="text-white/30 text-sm font-light">{item.desc}</p>
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>
 
-          <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8">
-            {submitted ? (
-              <div className="flex flex-col items-center justify-center h-full text-center py-12">
-                <div className="text-6xl mb-4">✅</div>
-                <h3 className="text-xl font-bold text-white mb-2">Richiesta Inviata!</h3>
-                <p className="text-gray-400">Ti contatteremo entro 24 ore lavorative.</p>
+          {/* Right - Visual */}
+          <motion.div style={{ y }} className="relative">
+            <div className="aspect-[4/5] bg-gradient-to-br from-white/[0.03] to-transparent border border-white/5 rounded-sm relative overflow-hidden">
+              {/* Grid pattern */}
+              <div className="absolute inset-0 opacity-20" style={{
+                backgroundImage: 'linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)',
+                backgroundSize: '40px 40px'
+              }} />
+              
+              {/* Center element */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="text-center">
+                  <div className="w-20 h-20 bg-white/5 border border-white/10 rounded-sm flex items-center justify-center mx-auto mb-6">
+                    <span className="text-white/60 font-black text-2xl">L</span>
+                  </div>
+                  <div className="text-white/20 text-[10px] tracking-[0.3em] uppercase">→ Il Tuo Logo</div>
+                </div>
               </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="space-y-5">
-                <h3 className="text-xl font-bold text-white mb-6">Richiedi un Preventivo</h3>
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <input
-                    type="text"
-                    placeholder="Nome *"
-                    required
-                    value={formData.nome}
-                    onChange={(e) => setFormData({...formData, nome: e.target.value})}
-                    className="bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Azienda"
-                    value={formData.azienda}
-                    onChange={(e) => setFormData({...formData, azienda: e.target.value})}
-                    className="bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition"
-                  />
-                </div>
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <input
-                    type="text"
-                    placeholder="P.IVA"
-                    value={formData.piva}
-                    onChange={(e) => setFormData({...formData, piva: e.target.value})}
-                    className="bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition"
-                  />
-                  <input
-                    type="email"
-                    placeholder="Email *"
-                    required
-                    value={formData.email}
-                    onChange={(e) => setFormData({...formData, email: e.target.value})}
-                    className="bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition"
-                  />
-                </div>
-                <input
-                  type="tel"
-                  placeholder="Telefono"
-                  value={formData.tel}
-                  onChange={(e) => setFormData({...formData, tel: e.target.value})}
-                  className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition"
-                />
-                <textarea
-                  placeholder="Descrivi le tue esigenze..."
-                  rows={4}
-                  value={formData.messaggio}
-                  onChange={(e) => setFormData({...formData, messaggio: e.target.value})}
-                  className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition resize-none"
-                />
-                <button
-                  type="submit"
-                  className="w-full bg-gradient-to-r from-blue-600 to-cyan-500 text-white py-4 rounded-lg font-semibold hover:shadow-xl hover:shadow-blue-500/25 transition-all hover:scale-[1.02]"
+
+              {/* Corner accents */}
+              <div className="absolute top-4 left-4 w-8 h-8 border-t border-l border-blue-400/30" />
+              <div className="absolute top-4 right-4 w-8 h-8 border-t border-r border-blue-400/30" />
+              <div className="absolute bottom-4 left-4 w-8 h-8 border-b border-l border-blue-400/30" />
+              <div className="absolute bottom-4 right-4 w-8 h-8 border-b border-r border-blue-400/30" />
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ===== MARQUEE =====
+function Marquee() {
+  const items = ['MICROFIBRA', 'PROFESSIONALE', 'B2B', 'DETAILING', 'SOSTENIBILE', 'CERTIFICATO', 'PREMIUM', 'INDUSTRIALE'];
+  
+  return (
+    <div className="py-12 bg-black border-y border-white/5 overflow-hidden">
+      <motion.div
+        className="flex gap-12 whitespace-nowrap"
+        animate={{ x: ['0%', '-50%'] }}
+        transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
+      >
+        {[...items, ...items].map((item, i) => (
+          <span key={i} className="text-3xl md:text-5xl font-black text-white/[0.04] tracking-tight">
+            {item}
+          </span>
+        ))}
+      </motion.div>
+    </div>
+  );
+}
+
+// ===== BLOG =====
+function Blog() {
+  const posts = [
+    { title: 'Il Kit Essenziale: 5 Panni che Ogni Professionista Deve Avere', date: 'Ago 2025', cat: 'GUIDE' },
+    { title: 'Come Lavare l\'Auto Senza Graffiarla: Guida Definitiva', date: 'Ago 2025', cat: 'DETAILING' },
+    { title: 'Panni in Microfibra per Pulizie Domestiche', date: 'Set 2025', cat: 'GUIDE' },
+  ];
+
+  return (
+    <RevealSection id="blog" className="py-32 lg:py-44 bg-black">
+      <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-6">
+          <div>
+            <span className="text-[11px] font-medium tracking-[0.3em] uppercase text-blue-400/60">06 — Journal</span>
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mt-4 tracking-tight">
+              Dal blog.
+            </h2>
+          </div>
+          <a href="#" className="text-[11px] tracking-[0.2em] uppercase text-white/40 hover:text-blue-400 transition-colors border-b border-white/20 hover:border-blue-400 pb-1">
+            Tutti gli articoli →
+          </a>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-[1px] bg-white/5">
+          {posts.map((post, i) => (
+            <motion.article
+              key={post.title}
+              className="bg-black p-8 lg:p-10 group cursor-pointer"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: i * 0.15 }}
+            >
+              <div className="flex items-center gap-3 mb-6">
+                <span className="text-[9px] tracking-[0.2em] uppercase text-blue-400/60 border border-blue-400/20 px-2 py-1">{post.cat}</span>
+                <span className="text-[11px] text-white/20">{post.date}</span>
+              </div>
+              <h3 className="text-lg font-bold text-white leading-snug group-hover:text-blue-300 transition-colors duration-500 mb-6">
+                {post.title}
+              </h3>
+              <div className="flex items-center gap-2 text-white/20 group-hover:text-blue-400 transition-all duration-500">
+                <span className="text-[10px] uppercase tracking-wider">Leggi</span>
+                <span className="text-sm">→</span>
+              </div>
+            </motion.article>
+          ))}
+        </div>
+      </div>
+    </RevealSection>
+  );
+}
+
+// ===== CONTACT =====
+function Contact() {
+  const [submitted, setSubmitted] = useState(false);
+  const [formData, setFormData] = useState({ nome: '', azienda: '', piva: '', email: '', tel: '', messaggio: '' });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitted(true);
+  };
+
+  return (
+    <section id="contatti" className="py-32 lg:py-44 bg-black relative overflow-hidden">
+      {/* Background */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_rgba(59,130,246,0.08)_0%,_transparent_60%)]" />
+
+      <div className="relative max-w-[1400px] mx-auto px-6 lg:px-12">
+        <div className="grid lg:grid-cols-2 gap-16 lg:gap-24">
+          {/* Left */}
+          <div>
+            <span className="text-[11px] font-medium tracking-[0.3em] uppercase text-blue-400/60">07 — Contatti</span>
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mt-4 tracking-tight leading-[0.9] mb-8">
+              Parliamo di<br />
+              <span className="bg-gradient-to-r from-blue-300 to-cyan-200 bg-clip-text text-transparent">business.</span>
+            </h2>
+            <p className="text-white/40 text-lg font-light leading-relaxed mb-12 max-w-md">
+              Il nostro team è composto da consulenti specializzati pronti ad analizzare le tue esigenze per un'offerta su misura.
+            </p>
+
+            <div className="space-y-8">
+              {[
+                { icon: '—', title: 'Listino Riservato', desc: 'Condizioni B2B vantaggiose' },
+                { icon: '—', title: 'Consulenza Gratuita', desc: 'Scelta dei prodotti performanti' },
+                { icon: '—', title: 'Schede Tecniche', desc: 'Documentazione completa' },
+                { icon: '—', title: 'Personalizzazione', desc: 'Il tuo brand sui prodotti' },
+              ].map((item, i) => (
+                <motion.div
+                  key={item.title}
+                  className="flex items-start gap-4"
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: i * 0.1 }}
                 >
-                  Invia Richiesta Preventivo
-                </button>
-                <p className="text-gray-500 text-xs text-center">
-                  Inviando accetti l'informativa sulla privacy
-                </p>
-              </form>
-            )}
+                  <span className="text-blue-400/50 text-sm mt-1">{item.icon}</span>
+                  <div>
+                    <h4 className="text-white font-medium text-sm">{item.title}</h4>
+                    <p className="text-white/30 text-sm font-light">{item.desc}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          {/* Right - Form */}
+          <div className="bg-white/[0.02] border border-white/5 p-8 lg:p-12">
+            <AnimatePresence mode="wait">
+              {submitted ? (
+                <motion.div
+                  key="success"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="flex flex-col items-center justify-center h-full text-center py-16"
+                >
+                  <div className="w-16 h-16 border border-blue-400/30 rounded-full flex items-center justify-center mb-6">
+                    <span className="text-blue-400 text-2xl">✓</span>
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-2">Richiesta Inviata</h3>
+                  <p className="text-white/40 text-sm font-light">Ti contatteremo entro 24 ore lavorative.</p>
+                </motion.div>
+              ) : (
+                <motion.form
+                  key="form"
+                  onSubmit={handleSubmit}
+                  className="space-y-6"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                >
+                  <h3 className="text-lg font-bold text-white mb-2">Richiedi Preventivo</h3>
+                  <p className="text-white/30 text-sm font-light mb-8">Compila il form per ricevere un'offerta dedicata.</p>
+                  
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <input
+                      type="text"
+                      placeholder="Nome *"
+                      required
+                      value={formData.nome}
+                      onChange={(e) => setFormData({...formData, nome: e.target.value})}
+                      className="bg-transparent border-b border-white/10 pb-3 text-white text-sm placeholder-white/20 focus:outline-none focus:border-blue-400/50 transition-colors"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Azienda"
+                      value={formData.azienda}
+                      onChange={(e) => setFormData({...formData, azienda: e.target.value})}
+                      className="bg-transparent border-b border-white/10 pb-3 text-white text-sm placeholder-white/20 focus:outline-none focus:border-blue-400/50 transition-colors"
+                    />
+                  </div>
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <input
+                      type="text"
+                      placeholder="P.IVA"
+                      value={formData.piva}
+                      onChange={(e) => setFormData({...formData, piva: e.target.value})}
+                      className="bg-transparent border-b border-white/10 pb-3 text-white text-sm placeholder-white/20 focus:outline-none focus:border-blue-400/50 transition-colors"
+                    />
+                    <input
+                      type="email"
+                      placeholder="Email *"
+                      required
+                      value={formData.email}
+                      onChange={(e) => setFormData({...formData, email: e.target.value})}
+                      className="bg-transparent border-b border-white/10 pb-3 text-white text-sm placeholder-white/20 focus:outline-none focus:border-blue-400/50 transition-colors"
+                    />
+                  </div>
+                  <input
+                    type="tel"
+                    placeholder="Telefono"
+                    value={formData.tel}
+                    onChange={(e) => setFormData({...formData, tel: e.target.value})}
+                    className="w-full bg-transparent border-b border-white/10 pb-3 text-white text-sm placeholder-white/20 focus:outline-none focus:border-blue-400/50 transition-colors"
+                  />
+                  <textarea
+                    placeholder="Descrivi le tue esigenze..."
+                    rows={4}
+                    value={formData.messaggio}
+                    onChange={(e) => setFormData({...formData, messaggio: e.target.value})}
+                    className="w-full bg-transparent border-b border-white/10 pb-3 text-white text-sm placeholder-white/20 focus:outline-none focus:border-blue-400/50 transition-colors resize-none"
+                  />
+                  <button
+                    type="submit"
+                    className="w-full bg-white text-black py-4 text-sm font-semibold tracking-wide uppercase hover:bg-blue-400 hover:text-white transition-all duration-500 mt-4"
+                  >
+                    Invia Richiesta
+                  </button>
+                  <p className="text-white/15 text-[10px] text-center tracking-wider uppercase">
+                    Accettando l'informativa sulla privacy
+                  </p>
+                </motion.form>
+              )}
+            </AnimatePresence>
           </div>
         </div>
       </div>
@@ -833,84 +829,65 @@ function ContactForm() {
 // ===== FOOTER =====
 function Footer() {
   return (
-    <footer className="bg-gray-900 border-t border-gray-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-10">
+    <footer className="bg-black border-t border-white/5 py-16 lg:py-20">
+      <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
           {/* Brand */}
-          <div className="lg:col-span-1">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-cyan-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">L</span>
+          <div>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-8 h-8 bg-white rounded-sm flex items-center justify-center">
+                <span className="text-black font-black text-sm">L</span>
               </div>
-              <div>
-                <span className="font-bold text-xl text-white">LINT</span>
-                <span className="block text-[10px] uppercase tracking-widest text-gray-500">Professional Cleaning</span>
-              </div>
+              <span className="text-white font-bold text-lg">LINT</span>
             </div>
-            <p className="text-gray-400 text-sm leading-relaxed">
-              Specialisti nella selezione e distribuzione di panni in microfibra professionali per i settori più esigenti.
+            <p className="text-white/30 text-sm font-light leading-relaxed">
+              Specialisti nella selezione e distribuzione di panni in microfibra professionali.
             </p>
           </div>
 
-          {/* Products */}
+          {/* Links */}
           <div>
-            <h4 className="text-white font-semibold mb-4">Prodotti</h4>
-            <ul className="space-y-2">
-              {['Panni in Microfibra', 'Accessori Pulizia', 'Ricambi', 'Prodotti Chimici', 'Kit Fotovoltaico'].map((item) => (
-                <li key={item}>
-                  <a href="#" className="text-gray-400 text-sm hover:text-blue-400 transition-colors">{item}</a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Sectors */}
-          <div>
-            <h4 className="text-white font-semibold mb-4">Settori</h4>
-            <ul className="space-y-2">
-              {['Car Detailing', 'Imprese di Pulizia', 'Hotel & Ristoranti', 'Fotovoltaico', 'Nautica'].map((item) => (
-                <li key={item}>
-                  <a href="#" className="text-gray-400 text-sm hover:text-blue-400 transition-colors">{item}</a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Contact */}
-          <div>
-            <h4 className="text-white font-semibold mb-4">Contatti</h4>
+            <h4 className="text-[10px] tracking-[0.2em] uppercase text-white/40 mb-6">Prodotti</h4>
             <ul className="space-y-3">
-              <li className="flex items-center gap-2 text-gray-400 text-sm">
-                <span>📧</span> info@lintmicrofibercloths.it
-              </li>
-              <li className="flex items-center gap-2 text-gray-400 text-sm">
-                <span>📱</span> +39 XXX XXX XXXX
-              </li>
-              <li className="flex items-center gap-2 text-gray-400 text-sm">
-                <span>🌐</span> www.lintmicrofibercloths.it
-              </li>
+              {['Microfibra', 'Accessori', 'Ricambi', 'Chimici'].map((item) => (
+                <li key={item}><a href="#" className="text-white/30 text-sm hover:text-white transition-colors font-light">{item}</a></li>
+              ))}
             </ul>
-            <div className="mt-6">
-              <a
-                href="https://www.ebay.it/str/lintpannimircrofibra"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-blue-600/20 text-blue-400 px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-600/30 transition-colors"
-              >
-                🛒 Acquista su eBay (Privati)
-              </a>
-            </div>
+          </div>
+
+          <div>
+            <h4 className="text-[10px] tracking-[0.2em] uppercase text-white/40 mb-6">Settori</h4>
+            <ul className="space-y-3">
+              {['Detailing', 'Imprese', 'Hotel', 'Fotovoltaico'].map((item) => (
+                <li key={item}><a href="#" className="text-white/30 text-sm hover:text-white transition-colors font-light">{item}</a></li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="text-[10px] tracking-[0.2em] uppercase text-white/40 mb-6">Contatti</h4>
+            <ul className="space-y-3">
+              <li className="text-white/30 text-sm font-light">info@lintmicrofibercloths.it</li>
+              <li className="text-white/30 text-sm font-light">www.lintmicrofibercloths.it</li>
+            </ul>
+            <a
+              href="https://www.ebay.it/str/lintpannimircrofibra"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block mt-6 text-[10px] tracking-[0.2em] uppercase text-blue-400/60 border border-blue-400/20 px-4 py-2 hover:border-blue-400/50 hover:text-blue-400 transition-all"
+            >
+              eBay → Privati
+            </a>
           </div>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-gray-800 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <p className="text-gray-500 text-sm">
-            © 2025 LINT Professional Cleaning. Tutti i diritti riservati.
+        <div className="pt-8 border-t border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4">
+          <p className="text-white/20 text-[11px] tracking-wider">
+            © 2025 LINT Professional Cleaning
           </p>
-          <div className="flex gap-6">
-            <a href="#" className="text-gray-500 text-sm hover:text-blue-400 transition-colors">Privacy Policy</a>
-            <a href="#" className="text-gray-500 text-sm hover:text-blue-400 transition-colors">Cookie Policy</a>
-            <a href="#" className="text-gray-500 text-sm hover:text-blue-400 transition-colors">P.IVA</a>
+          <div className="flex gap-8">
+            <a href="#" className="text-white/20 text-[11px] hover:text-white/50 transition-colors tracking-wider">Privacy</a>
+            <a href="#" className="text-white/20 text-[11px] hover:text-white/50 transition-colors tracking-wider">Cookie</a>
           </div>
         </div>
       </div>
@@ -921,17 +898,20 @@ function Footer() {
 // ===== MAIN APP =====
 export default function App() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-black text-white overflow-x-hidden">
+      <GrainOverlay />
+      <Letterbox />
+      <ScrollProgress />
       <Header />
       <Hero />
-      <Categories />
-      <ProductTypes />
-      <WhyChooseUs />
-      <Sectors />
+      <Gamma />
+      <ProductLines />
+      <Qualita />
+      <Settori />
       <Customization />
-      <FeaturedProducts />
-      <BlogPreview />
-      <ContactForm />
+      <Marquee />
+      <Blog />
+      <Contact />
       <Footer />
     </div>
   );
