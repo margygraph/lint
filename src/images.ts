@@ -5,7 +5,7 @@
 
 export const IMAGES = {
   // === LOGO ===
-  logo: 'https://image.qwenlm.ai/generated-images/b4292e90-e904-4c93-a592-b85a51ceb280/_result.png',
+  logo: 'https://www.lintmicrofibercloths.it/wp-content/uploads/2024/10/lintlogo.png.webp',
 
   // === ORIGINALI dal sito WordPress ===
   catPanni: 'https://www.lintmicrofibercloths.it/wp-content/uploads/2025/07/Cat_Panno-Microfibra.png.webp',
