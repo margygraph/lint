@@ -289,10 +289,10 @@ function RevealSection({ children, className = '', id = '' }: { children: React.
 // ===== GAMMA / CATEGORIES =====
 function Gamma() {
   const categories = [
-    { icon: '🧽', title: 'Panni in Microfibra', desc: 'Grammature e trame specifiche per ogni applicazione professionale.', tag: 'CORE', gradient: 'from-sky-400 to-blue-400' },
-    { icon: '🔧', title: 'Accessori', desc: 'Spazzole anti-graffio, pistole pneumatiche, sistemi di lavaggio.', tag: 'TOOLS', gradient: 'from-cyan-400 to-teal-400' },
-    { icon: '⚙️', title: 'Ricambi', desc: 'Componenti per aspiratori, mop e sistemi a estrazione.', tag: 'PARTS', gradient: 'from-emerald-400 to-green-400' },
-    { icon: '🧪', title: 'Prodotti Chimici', desc: 'Formule concentrate: sgrassanti, detergenti, disinfettanti.', tag: 'CHEM', gradient: 'from-teal-400 to-cyan-400' },
+    { image: IMAGES.catPanni, title: 'Panni in Microfibra', desc: 'Grammature e trame specifiche per ogni applicazione professionale.', tag: 'CORE', gradient: 'from-sky-400 to-blue-400' },
+    { image: IMAGES.catAccessori, title: 'Accessori', desc: 'Spazzole anti-graffio, pistole pneumatiche, sistemi di lavaggio.', tag: 'TOOLS', gradient: 'from-cyan-400 to-teal-400' },
+    { image: IMAGES.catRicambi, title: 'Ricambi', desc: 'Componenti per aspiratori, mop e sistemi a estrazione.', tag: 'PARTS', gradient: 'from-emerald-400 to-green-400' },
+    { image: IMAGES.catChimici, title: 'Prodotti Chimici', desc: 'Formule concentrate: sgrassanti, detergenti, disinfettanti.', tag: 'CHEM', gradient: 'from-teal-400 to-cyan-400' },
   ];
 
   return (
@@ -322,28 +322,41 @@ function Gamma() {
           {categories.map((cat, i) => (
             <motion.div
               key={cat.title}
-              className="group bg-gradient-to-br from-white to-sky-50/30 rounded-3xl p-8 border border-sky-100/50 hover:border-sky-200 hover:shadow-2xl hover:shadow-sky-100/50 transition-all duration-500 cursor-pointer"
+              className="group bg-white rounded-3xl overflow-hidden border border-sky-100/50 hover:border-sky-200 hover:shadow-2xl hover:shadow-sky-100/50 transition-all duration-500 cursor-pointer"
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: i * 0.1 }}
               whileHover={{ y: -8 }}
             >
-              <div className={`w-16 h-16 bg-gradient-to-br ${cat.gradient} rounded-2xl flex items-center justify-center text-3xl mb-6 shadow-lg shadow-sky-200/30 group-hover:scale-110 transition-transform duration-500`}>
-                {cat.icon}
+              {/* Immagine prodotto */}
+              <div className="relative h-48 bg-gradient-to-br from-sky-50 to-cyan-50 overflow-hidden">
+                <img 
+                  src={cat.image} 
+                  alt={cat.title}
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                />
+                <div className={`absolute inset-0 bg-gradient-to-br ${cat.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`} />
+                {/* Tag badge */}
+                <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full">
+                  <span className="text-[10px] tracking-[0.2em] uppercase text-sky-500 font-bold">
+                    {cat.tag}
+                  </span>
+                </div>
               </div>
-              <div className="text-[10px] tracking-[0.2em] uppercase text-sky-400/60 font-semibold mb-2">
-                {cat.tag}
-              </div>
-              <h3 className="text-xl font-bold text-gray-800 mb-3 group-hover:text-sky-600 transition-colors duration-300">
-                {cat.title}
-              </h3>
-              <p className="text-gray-500 text-sm leading-relaxed font-light">
-                {cat.desc}
-              </p>
-              <div className="mt-6 flex items-center gap-2 text-sky-500 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                <span className="text-xs uppercase tracking-wider font-semibold">Scopri</span>
-                <span className="text-lg">→</span>
+              
+              {/* Contenuto */}
+              <div className="p-6">
+                <h3 className="text-xl font-bold text-gray-800 mb-3 group-hover:text-sky-600 transition-colors duration-300">
+                  {cat.title}
+                </h3>
+                <p className="text-gray-500 text-sm leading-relaxed font-light mb-4">
+                  {cat.desc}
+                </p>
+                <div className="flex items-center gap-2 text-sky-500">
+                  <span className="text-xs uppercase tracking-wider font-semibold">Scopri</span>
+                  <span className="text-lg group-hover:translate-x-1 transition-transform duration-300">→</span>
+                </div>
               </div>
             </motion.div>
           ))}
