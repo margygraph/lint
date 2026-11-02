@@ -57,18 +57,21 @@ function Header() {
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <motion.div
+          <motion.a
+            href="/"
             className="flex items-center gap-3"
             whileHover={{ scale: 1.02 }}
           >
-            <div className="w-10 h-10 bg-gradient-to-br from-sky-400 to-cyan-300 rounded-xl flex items-center justify-center shadow-lg shadow-sky-200/50">
-              <span className="text-white font-bold text-lg">L</span>
-            </div>
+            <img
+              src={IMAGES.logo}
+              alt="LINT Logo"
+              className="w-10 h-10 rounded-xl object-cover shadow-lg shadow-sky-200/50"
+            />
             <div className="hidden sm:block">
               <span className="text-gray-800 font-bold text-xl tracking-tight">LINT</span>
               <span className="block text-[10px] uppercase tracking-widest text-sky-500/60">Professional</span>
             </div>
-          </motion.div>
+          </motion.a>
 
           {/* Nav */}
           <nav className="hidden lg:flex items-center gap-10">
@@ -643,10 +646,12 @@ function Customization() {
               {/* Center element */}
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="text-center">
-                  <div className="w-24 h-24 bg-gradient-to-br from-sky-400 to-cyan-400 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-sky-200/50">
-                    <span className="text-white font-black text-3xl">L</span>
-                  </div>
-                  <div className="text-sky-400 text-xs tracking-[0.3em] uppercase font-semibold">→ Il Tuo Logo</div>
+                  <img
+                    src={IMAGES.logo}
+                    alt="LINT Logo"
+                    className="w-24 h-24 rounded-3xl object-cover mx-auto mb-6 shadow-xl shadow-sky-200/50"
+                  />
+                  <div className="text-sky-400 text-xs tracking-[0.3em] uppercase font-semibold">→ Il Tuo Logo Qui</div>
                 </div>
               </div>
 
@@ -898,9 +903,11 @@ function Footer() {
           {/* Brand */}
           <div>
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 bg-gradient-to-br from-sky-400 to-cyan-300 rounded-xl flex items-center justify-center shadow-lg shadow-sky-200/50">
-                <span className="text-white font-bold text-lg">L</span>
-              </div>
+              <img
+                src={IMAGES.logo}
+                alt="LINT Logo"
+                className="w-10 h-10 rounded-xl object-cover shadow-lg shadow-sky-200/50"
+              />
               <div>
                 <span className="text-gray-800 font-bold text-xl">LINT</span>
                 <span className="block text-[10px] uppercase tracking-widest text-sky-500/60">Professional</span>

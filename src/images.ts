@@ -1,8 +1,12 @@
 // Immagini del sito
+// - Logo originale
 // - Originali dal sito WordPress (sez. Gamma)
 // - Generate con AI (altre sezioni)
 
 export const IMAGES = {
+  // === LOGO ===
+  logo: 'https://image.qwenlm.ai/generated-images/b4292e90-e904-4c93-a592-b85a51ceb280/_result.png',
+
   // === ORIGINALI dal sito WordPress ===
   catPanni: 'https://www.lintmicrofibercloths.it/wp-content/uploads/2025/07/Cat_Panno-Microfibra.png.webp',
   catAccessori: 'https://www.lintmicrofibercloths.it/wp-content/uploads/2025/07/Cat_Accessori-Pulizia.png.webp',
