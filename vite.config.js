@@ -1,0 +1,26 @@
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import tailwindcss from "@tailwindcss/vite";
+
+// Per GitHub Pages, imposta il base path al nome del tuo repository
+// Esempio: se il repo è "username.github.io", usa '/'
+// Se il repo è "lint-website", usa '/lint-website/'
+const base = process.env.NODE_ENV === 'production' ? '/lint-website/' : '/';
+
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
+  base: base,
+  server: {
+    host: "0.0.0.0",
+    port: 3000,
+    strictPort: true,
+    hmr: {
+      port: 3000,
+    },
+  },
+  build: {
+    outDir: 'dist',
+    assetsDir: 'assets',
+    sourcemap: false,
+  },
+});
