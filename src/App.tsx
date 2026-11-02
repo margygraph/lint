@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform, useInView, AnimatePresence } from 'framer-motion';
+import { IMAGES } from './images';
 
 // ===== FRESH GRAIN OVERLAY (very subtle) =====
 function FreshOverlay() {
@@ -134,8 +135,14 @@ function Hero() {
 
   return (
     <section ref={ref} className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-sky-50 via-white to-cyan-50">
-      {/* Background elements */}
+      {/* Background image */}
       <motion.div style={{ y, opacity }} className="absolute inset-0">
+        <img 
+          src={IMAGES.hero} 
+          alt="Panni in Microfibra Professionali"
+          className="absolute inset-0 w-full h-full object-cover opacity-30"
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-sky-50/70 via-white/50 to-cyan-50/70" />
         {/* Soft gradient orbs */}
         <motion.div
           className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-sky-200/30 rounded-full blur-[150px]"
@@ -356,7 +363,7 @@ function ProductLines() {
       desc: 'Densità di fibre superiore per assorbimento e resistenza eccezionali. Il fondamento di ogni kit professionale.',
       specs: ['300+ GSM', '500 cicli lavaggio', 'Multi-superficie'],
       gradient: 'from-sky-400 to-blue-500',
-      emoji: '🧹'
+      image: IMAGES.multiuso
     },
     {
       num: '02',
@@ -365,7 +372,7 @@ function ProductLines() {
       desc: 'Trame specifiche ingegnerizzate per finitura cristallina. Zero aloni, zero striature, zero pelucchi.',
       specs: ['Nido d\'ape', 'Ultra-fine', 'Anti-alone'],
       gradient: 'from-cyan-400 to-teal-500',
-      emoji: '🪟'
+      image: IMAGES.vetri
     },
     {
       num: '03',
@@ -374,7 +381,7 @@ function ProductLines() {
       desc: 'Bordi in seta, senza cuciture o taglio laser. La selezione curata per i detailer più esigenti.',
       specs: ['Edgeless', 'Bordo seta', 'GSM 300-1200'],
       gradient: 'from-emerald-400 to-green-500',
-      emoji: '🚗'
+      image: IMAGES.detailing
     },
   ];
 
@@ -408,8 +415,8 @@ function ProductLines() {
 
               {/* Icon & Title */}
               <div className="lg:col-span-4 flex items-center gap-4">
-                <div className={`text-5xl w-20 h-20 bg-gradient-to-br ${line.gradient} rounded-2xl flex items-center justify-center shadow-lg shadow-sky-200/30`}>
-                  {line.emoji}
+                <div className={`w-20 h-20 rounded-2xl overflow-hidden shadow-lg shadow-sky-200/30 flex-shrink-0`}>
+                  <img src={line.image} alt={line.title} className="w-full h-full object-cover" />
                 </div>
                 <div>
                   <div className="text-[10px] tracking-[0.2em] uppercase text-sky-400/60 font-semibold mb-1">{line.subtitle}</div>
@@ -445,9 +452,9 @@ function ProductLines() {
 // ===== QUALITÀ =====
 function Qualita() {
   const pillars = [
-    { num: 'I', title: 'Sostenibilità', value: '90%', label: 'meno chimici', desc: 'Alta efficacia pulente con la sola acqua. Riduzione drastica dei detergenti chimici.', icon: '🌱', gradient: 'from-emerald-400 to-green-500' },
-    { num: 'II', title: 'Durata', value: '500+', label: 'cicli a 90°C', desc: 'Resistenza certificata. Un investimento, non un costo ricorrente.', icon: '🏭', gradient: 'from-sky-400 to-blue-500' },
-    { num: 'III', title: 'Efficacia', value: '99.9%', label: 'batteri rimossi', desc: 'Certificazione indipendente. Standard sanitari e detailing.', icon: '🔬', gradient: 'from-cyan-400 to-teal-500' },
+    { num: 'I', title: 'Sostenibilità', value: '90%', label: 'meno chimici', desc: 'Alta efficacia pulente con la sola acqua. Riduzione drastica dei detergenti chimici.', image: IMAGES.sostenibilita, gradient: 'from-emerald-400 to-green-500' },
+    { num: 'II', title: 'Durata', value: '500+', label: 'cicli a 90°C', desc: 'Resistenza certificata. Un investimento, non un costo ricorrente.', image: IMAGES.durata, gradient: 'from-sky-400 to-blue-500' },
+    { num: 'III', title: 'Efficacia', value: '99.9%', label: 'batteri rimossi', desc: 'Certificazione indipendente. Standard sanitari e detailing.', image: IMAGES.efficacia, gradient: 'from-cyan-400 to-teal-500' },
   ];
 
   return (
@@ -471,7 +478,9 @@ function Qualita() {
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: i * 0.2 }}
             >
-              <div className="text-5xl mb-6">{pillar.icon}</div>
+              <div className="w-full h-48 rounded-2xl overflow-hidden mb-6">
+                <img src={pillar.image} alt={pillar.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+              </div>
               <div className="mb-6">
                 <span className={`text-5xl lg:text-6xl font-bold bg-gradient-to-r ${pillar.gradient} bg-clip-text text-transparent`}>
                   {pillar.value}
