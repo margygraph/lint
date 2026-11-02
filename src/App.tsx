@@ -65,7 +65,7 @@ function Header() {
             <img
               src={IMAGES.logo}
               alt="LINT Logo"
-              className="w-10 h-10 rounded-xl object-cover shadow-lg shadow-sky-200/50"
+              className="h-10 w-auto object-contain"
             />
             <div className="hidden sm:block">
               <span className="text-gray-800 font-bold text-xl tracking-tight">LINT</span>
@@ -649,7 +649,7 @@ function Customization() {
                   <img
                     src={IMAGES.logo}
                     alt="LINT Logo"
-                    className="w-24 h-24 rounded-3xl object-cover mx-auto mb-6 shadow-xl shadow-sky-200/50"
+                    className="h-24 w-auto object-contain mx-auto mb-6"
                   />
                   <div className="text-sky-400 text-xs tracking-[0.3em] uppercase font-semibold">→ Il Tuo Logo Qui</div>
                 </div>
@@ -906,7 +906,7 @@ function Footer() {
               <img
                 src={IMAGES.logo}
                 alt="LINT Logo"
-                className="w-10 h-10 rounded-xl object-cover shadow-lg shadow-sky-200/50"
+                className="h-10 w-auto object-contain"
               />
               <div>
                 <span className="text-gray-800 font-bold text-xl">LINT</span>
